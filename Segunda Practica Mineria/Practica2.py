@@ -123,6 +123,13 @@ def OrdenarDataFrameHorasTurno(raw_df: pd.DataFrame, ColumMover: str, ColumDespu
     #esta función despues de definirla, lo de ColumnaQuitada
     return raw_df #Ya regresamos el dataframe modificado
 
+#Septima función, esta función se encarga de eliminar las filas que esten duplicadas, es decir que sean identicas en su registro, es cuestión para que a la hora de analizar
+#el dataframe y pues hacer la mineria de datos como tal, no salgan estos valores duplicados y afecten el analisis, es cuestión de limpieza todavia
+def Eliminar_Duplicado(raw_df: pd.DataFrame)->pd.DataFrame:#Nombre de la función, recibe de parametro un dataframe y regresa un dataframe
+    return raw_df.drop_duplicates() #del dataframe del parametro uso el metodo de eliminar duplicados y lo regreso
+
+
+
 #Esta función basicamente es la compilación de todas las funciones anteriores con los parametros adecuados y me genera al final la modificacion del dataset donde no esta ordenado
 def DataFrame_Clean():
     DataFrame = pd.read_csv('DataSet.csv') #Se declara el dataframe, que lo lee de DataSet.csv, que sería el dataset que se descargo en la practica 1
@@ -135,6 +142,12 @@ def DataFrame_Clean():
         #Recruitment Contact
     DataFrame = OrdenarDataFrameHorasTurno(DataFrame,'Hours/Shift','Work Location') #Ordenamos para que Horas/Turno este antes de Localización Trabajo, asi tiene un poco mas de 
     #coherencia como es que tienen secuencia los datos, es mera cuestión de organización aca
+    DataFrame = Eliminar_Columna (DataFrame,'Posting Type') #Decidi borrar la columna Posting Type tambien, dado que solamente tenia de opción internal y external
+    #Significaba que si era internal era una oferta de trabajo para empleados, y external una oferta de trabajo para pues gente que no es empleado de la empresa
+    #Pero pues lo considere un poco como irrelevante, y lo comente con el docente en clase, entonces decidi eliminar esta columna (Para que ya no salga Interal o External)
+    #Y acto seguido en la isguiente linea de codigo elimino duplicados, de tal forma que si existia un trabajo con 2 registros, uno external y uno internal, al final termina
+    #siendo unicamenete 1 solo, los "unifica" por asi decirlo
+    DataFrame = Eliminar_Duplicado(DataFrame) #Es para la unificación que se habla en la explicación anterior, se pasa de 6k+ rows a 3k rows
     DataFrame.to_csv('DataSet.csv', index=False) #Se actualiza el dataset, se pone el mismo nombre que el original para que lo reemplaze y solo se haya como actualizado, es decir
     #no se cree un archivo nuevo con otro nombre o algo por el estilo, solamente lo actualiza el dataset.
     print("El dataset ha sido actualizado")
